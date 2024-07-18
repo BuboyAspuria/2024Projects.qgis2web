@@ -1,0 +1,2168 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet-svg-shape-markers.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="data/Barangay_boundaries_01_1.js"></script>
+        <script src="data/BaguioBoundary_01_2.js"></script>
+        <script src="data/Roads_ceo_01_3.js"></script>
+        <script src="data/2024_Projects_4.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[16.36395449246067,120.53740524939292],[16.43431654559832,120.64524086017165]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // add class to format popup if it contains media
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					// Delay to force the redraw
+					setTimeout(function() {
+						popup.update();
+					}, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_GooglecnSatellite_0');
+        map.getPane('pane_GooglecnSatellite_0').style.zIndex = 400;
+        var layer_GooglecnSatellite_0 = L.tileLayer('http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}', {
+            pane: 'pane_GooglecnSatellite_0',
+            opacity: 1.0,
+            attribution: '<a href="https://www.google.com/intl/zh-CN_cn/permissions/geoguidelines/attr-guide.html">地图数据 ©2016 Google</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 21
+        });
+        layer_GooglecnSatellite_0;
+        map.addLayer(layer_GooglecnSatellite_0);
+        function pop_Barangay_boundaries_01_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>BRGY_NAME</strong><br />' + (feature.properties['BRGY_NAME'] !== null ? autolinker.link(feature.properties['BRGY_NAME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Barangay_boundaries_01_1_0(feature) {
+            switch(String(feature.properties['Barangay'])) {
+                case 'Abanao-Zandueta-Kayang-Chugum-Otek (AZKCO)':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Alfonso Tabora':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Ambiong':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Andres Bonifacio (Lower Bokawkan)':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Andres Bonifacio-Caguioa Rimando (ABCR)':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Apugan-Loakan':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Asin Road':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Atok Trail':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Aurora Hill Proper':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Aurora Hill, North Central':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Aurora Hill, South Central':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Bagong Lipunan (Market Area)':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Bakakeng Central':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Bakakeng North/Sur':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Bal-Marcoville (Marcoville)':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Balsigan':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Bayan Park East':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Bayan Park Village':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Bayan Park West (Leonila Hill)':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'BGH Compound':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Brookside':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Brookspoint':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Burnham-Legarda-Kisad':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Cabinet Hill-Teacher\'s Camp':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Camdas Subdivision':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Camp 7':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Camp 8':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Camp Allen':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Campo Filipino':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'City Camp Central':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'City Camp Proper':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Country Club Village':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Cresencia Village':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Dagsian, Lower':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Dagsian, Upper':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Department of Public Services (DPS) Compound':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Dizon Subdivision':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Dominican Hill Mirador':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Dontogan':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Engineers\' Hill':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Fairview Village':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Ferdinand Marcos (Happy Homes-Campo Sioco)':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Fort Del Pilar (PMA)':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Gabriela Silang':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'General Emilio F. Aguinaldo (Lower QM) GEFA':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'General Luna, Lower':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'General Luna, Upper':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Gibraltar':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Greenwater Village':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Guisad Central':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Guisad Surong':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Happy Homes Old Lucban (Happy Homes-Lucban)':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Harrison-Claudio Carantes':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Hillside':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Holyghost Extension':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Holyghost Proper':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Honeymoon (Honeymoon-Holyghost)':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Imelda R. Marcos (La Salle)':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Imelda Village':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Irisan':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Kabayanihan':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Kagitingan':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Kayang Extension':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Kayang Hilltop':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Kias':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Loakan Liwanag':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Loakan Proper':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Lopez Jaena':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Lourdes Subdivision Extension':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Lourdes Subdivision, Lower':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Lourdes Subdivision, Proper':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Lualhati':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Lucnab':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Magsaysay Private Road':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Magsaysay, Lower':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Magsaysay, Upper':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Malcolm Square-Perfecto':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Market Subdivision, Upper':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Mauel A. Roxas':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Middle Quezon Hill Subdivision':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Military Cut-off':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Mines View Park':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Modern Site, East':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Modern Site, West':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'MRR-Queen of Peace':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'New Lucban':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Outlook Drive':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Pacdal':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Padre Burgos':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Padre Zamora':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Palma Urbano':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Phil-Am':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Pinget':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Pinsao Pilot Project':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Pinsao Proper':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Poliwes':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Pucsusan':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Quezon Hill Proper':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Quezon Hill, Upper':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Quirino Hill, East':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Quirino Hill, Lower':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Quirino Hill, Middle':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Quirino Hill, West':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Quirino Magsaysay, Upper':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Rizal Monument Area':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Rock Quarry, Lower':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Rock Quarry, Middle':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Rock Quarry, Upper':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Saint Joseph Village':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Salud Mitra':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'San Antonio Village':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'San Luis Village':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'San Roque Village':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'San Vicente':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Sanitary Camp, North':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Sanitary Camp, South':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Santa Escolastica':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Santo Rosario Valley':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Santo Tomas Proper':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Santo Tomas School Area':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Scout Barrio':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Session Road Area (Gov. Pack)':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Slaughter House Area (Sto. NiÑo)':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'SLU-SVP Housing Village 1':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'SLU-SVP Housing Village 2':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'South Drive':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Teodora Alonso':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Trancoville':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Victoria Village':
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_Barangay_boundaries_01_1',
+                opacity: 1,
+                color: 'rgba(55,98,144,1.0)',
+                dashArray: '4.0,2.0',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Barangay_boundaries_01_1');
+        map.getPane('pane_Barangay_boundaries_01_1').style.zIndex = 401;
+        map.getPane('pane_Barangay_boundaries_01_1').style['mix-blend-mode'] = 'normal';
+        var layer_Barangay_boundaries_01_1 = new L.geoJson(json_Barangay_boundaries_01_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Barangay_boundaries_01_1',
+            layerName: 'layer_Barangay_boundaries_01_1',
+            pane: 'pane_Barangay_boundaries_01_1',
+            onEachFeature: pop_Barangay_boundaries_01_1,
+            style: style_Barangay_boundaries_01_1_0,
+        });
+        bounds_group.addLayer(layer_Barangay_boundaries_01_1);
+        map.addLayer(layer_Barangay_boundaries_01_1);
+        function pop_BaguioBoundary_01_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Municipali</th>\
+                        <td class="visible-with-data" id="Municipali">' + (feature.properties['Municipali'] !== null ? autolinker.link(feature.properties['Municipali'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Area_ha</th>\
+                        <td class="visible-with-data" id="Area_ha">' + (feature.properties['Area_ha'] !== null ? autolinker.link(feature.properties['Area_ha'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_BaguioBoundary_01_2_0() {
+            return {
+                pane: 'pane_BaguioBoundary_01_2',
+                opacity: 1,
+                color: 'rgba(64,120,64,0.9215686274509803)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_BaguioBoundary_01_2');
+        map.getPane('pane_BaguioBoundary_01_2').style.zIndex = 402;
+        map.getPane('pane_BaguioBoundary_01_2').style['mix-blend-mode'] = 'normal';
+        var layer_BaguioBoundary_01_2 = new L.geoJson(json_BaguioBoundary_01_2, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_BaguioBoundary_01_2',
+            layerName: 'layer_BaguioBoundary_01_2',
+            pane: 'pane_BaguioBoundary_01_2',
+            onEachFeature: pop_BaguioBoundary_01_2,
+            style: style_BaguioBoundary_01_2_0,
+        });
+        bounds_group.addLayer(layer_BaguioBoundary_01_2);
+        map.addLayer(layer_BaguioBoundary_01_2);
+        function pop_Roads_ceo_01_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Id'] !== null ? autolinker.link(feature.properties['Id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ROADNAME'] !== null ? autolinker.link(feature.properties['ROADNAME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ROADWIDTH'] !== null ? autolinker.link(feature.properties['ROADWIDTH'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ROADTYPE'] !== null ? autolinker.link(feature.properties['ROADTYPE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ROAD_LENGT'] !== null ? autolinker.link(feature.properties['ROAD_LENGT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Roads_ceo_01_3_0(feature) {
+            switch(String(feature.properties['ROADTYPE'])) {
+                case 'ALLEY':
+                    return {
+                pane: 'pane_Roads_ceo_01_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'BARANGAY':
+                    return {
+                pane: 'pane_Roads_ceo_01_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'CIRCUMFERENCIAL':
+                    return {
+                pane: 'pane_Roads_ceo_01_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'CITY':
+                    return {
+                pane: 'pane_Roads_ceo_01_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'NATIONAL':
+                    return {
+                pane: 'pane_Roads_ceo_01_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'PRIVATE':
+                    return {
+                pane: 'pane_Roads_ceo_01_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_Roads_ceo_01_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Roads_ceo_01_3');
+        map.getPane('pane_Roads_ceo_01_3').style.zIndex = 403;
+        map.getPane('pane_Roads_ceo_01_3').style['mix-blend-mode'] = 'normal';
+        var layer_Roads_ceo_01_3 = new L.geoJson(json_Roads_ceo_01_3, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Roads_ceo_01_3',
+            layerName: 'layer_Roads_ceo_01_3',
+            pane: 'pane_Roads_ceo_01_3',
+            onEachFeature: pop_Roads_ceo_01_3,
+            style: style_Roads_ceo_01_3_0,
+        });
+        bounds_group.addLayer(layer_Roads_ceo_01_3);
+        map.addLayer(layer_Roads_ceo_01_3);
+        function pop_2024_Projects_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>Control No: </strong><br />' + (feature.properties['Control_ID'] !== null ? autolinker.link(feature.properties['Control_ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Proj Title:</strong><br />' + (feature.properties['Prj_TITLE'] !== null ? autolinker.link(feature.properties['Prj_TITLE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Project Location: </strong><br />' + (feature.properties['Prj_LOC'] !== null ? autolinker.link(feature.properties['Prj_LOC'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Appropriation: </strong><br />' + (feature.properties['APPRORIATI'] !== null ? autolinker.link(feature.properties['APPRORIATI'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Status: </strong><br />' + (feature.properties['STATUS'] !== null ? autolinker.link(feature.properties['STATUS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Implementing Office</strong><br />' + (feature.properties['IMP_OFFICE'] !== null ? autolinker.link(feature.properties['IMP_OFFICE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Location: </strong><br />' + (feature.properties['IMG_LOC'] !== null ? '<img src="images/' + String(feature.properties['IMG_LOC']).replace(/[\\\/:]/g, '_').trim() + '">' : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Longtitude: </strong><br />' + (feature.properties['LONG'] !== null ? autolinker.link(feature.properties['LONG'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Latitude: </strong><br />' + (feature.properties['LAT'] !== null ? autolinker.link(feature.properties['LAT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_2024_Projects_4_0(feature) {
+            switch(String(feature.properties['STATUS'])) {
+                case 'Completed':
+                    return {
+                pane: 'pane_2024_Projects_4',
+                shape: 'diamond',
+                radius: 8.8,
+                opacity: 1,
+                color: 'rgba(90,69,37,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(110,195,99,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Not Started':
+                    return {
+                pane: 'pane_2024_Projects_4',
+                shape: 'diamond',
+                radius: 8.8,
+                opacity: 1,
+                color: 'rgba(90,69,37,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(217,217,217,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'On-going Implementation':
+                    return {
+                pane: 'pane_2024_Projects_4',
+                shape: 'diamond',
+                radius: 8.8,
+                opacity: 1,
+                color: 'rgba(90,69,37,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(228,228,8,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Suspended':
+                    return {
+                pane: 'pane_2024_Projects_4',
+                shape: 'diamond',
+                radius: 8.8,
+                opacity: 1,
+                color: 'rgba(90,69,37,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(204,0,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_2024_Projects_4',
+                shape: 'diamond',
+                radius: 8.8,
+                opacity: 1,
+                color: 'rgba(90,69,37,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(204,212,90,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_2024_Projects_4');
+        map.getPane('pane_2024_Projects_4').style.zIndex = 404;
+        map.getPane('pane_2024_Projects_4').style['mix-blend-mode'] = 'normal';
+        var layer_2024_Projects_4 = new L.geoJson(json_2024_Projects_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_2024_Projects_4',
+            layerName: 'layer_2024_Projects_4',
+            pane: 'pane_2024_Projects_4',
+            onEachFeature: pop_2024_Projects_4,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_2024_Projects_4_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_2024_Projects_4);
+        map.addLayer(layer_2024_Projects_4);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .title += 'Search for a place';
+        setBounds();
+        </script>
+    </body>
+</html>
